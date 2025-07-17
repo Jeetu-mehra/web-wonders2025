@@ -5,6 +5,107 @@ body {
   color: #222;
   scroll-behavior: smooth;
 }
+.hero-container {
+  background-image: url('https://images.unsplash.com/photo-1590080875656-7101b4db3c12');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  position: relative;
+  color: white;
+}
+
+.top-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background: none;
+  color: white;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: linear-gradient(to bottom, #f0f0f0, #ddd);
+  min-width: 250px;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+/* CATEGORY ITEM STYLING */
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.category-item img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.category-item span {
+  font-weight: bold;
+  color: #333;
+}
+
+.category-item:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+
+}
+
+/* MAIN TEXT CENTERED */
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+.nav-btn {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  margin: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+
+.nav-btn:hover {
+  background:none;
+}
 
 .hero {
   background: url('https://i.pinimg.com/1200x/e9/64/37/e96437871e84aaef8c51c0c031061068.jpg') no-repeat center center/cover;
@@ -43,23 +144,6 @@ body {
 .hero-text p {
   font-size: 1.2rem;
   animation: fadeIn 2s ease-out;
-}
-
-.cta-button {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 12px 28px;
-  background: #fff;
-  color: #000;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 50px;
-  transition: 0.3s;
-}
-
-.cta-button:hover {
-  background: none;
-  color: #fff;
 }
 
 .trending-section {
