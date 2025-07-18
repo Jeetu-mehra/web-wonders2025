@@ -104,7 +104,7 @@ const tren = () => {
       {currentPage === 1 && (
         <header className="hero relative h-screen flex items-center justify-center text-center"
           style={{
-            backgroundImage: "url('https://static.fibre2fashion.com//articleresources/images/23/2287/988ebe_Big.jpg')",
+            backgroundImage: "url('/siab/trending.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}>
@@ -118,7 +118,7 @@ const tren = () => {
               <div className="dropdown-content absolute hidden min-w-[250px] p-4 bg-gradient-to-b from-[#f0f0f0] to-[#ddd] rounded-xl shadow-lg z-50 opacity-0 translate-y-[-10px] transition-all duration-300 ease-in-out">
                 <Link href="/trending" className="category-item flex items-center gap-3 mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
                   <img
-                    src="https://i.pinimg.com/1200x/f6/51/3d/f6513deeb6a312151bcf52c71bfbb9f9.jpg"
+                    src="/siab/tren.jpg"
                     alt="Trending"
                     className="w-[50px] h-[50px] rounded-full object-cover"
                   />
@@ -126,15 +126,15 @@ const tren = () => {
                 </Link>
                 <Link href="/featured" className="category-item flex items-center gap-3 mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
                   <img
-                    src="https://i.pinimg.com/736x/2d/b0/07/2db0079f4bb2eb3b3d38bf294c2a3f62.jpg"
-                    alt="Jewellery"
+                    src="/siab/feat.jpg"
+                    alt="Featured"
                     className="w-[50px] h-[50px] rounded-full object-cover"
                   />
                   <span className="font-semibold text-[#333]">Featured</span>
                 </Link>
                 <Link href="/wedding" className="category-item flex items-center gap-3 mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
                   <img
-                    src="https://i.pinimg.com/1200x/41/af/d8/41afd86c24b8743bbcbe1d5a9e538fc6.jpg"
+                    src="/siab/wedd.jpg"
                     alt="Wedding"
                     className="w-[50px] h-[50px] rounded-full object-cover"
                   />
@@ -142,15 +142,15 @@ const tren = () => {
                 </Link>
                 <Link href="/traditional" className="category-item flex items-center gap-3 mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
                   <img
-                    src="https://i.pinimg.com/736x/74/93/f3/7493f3f10996d3960f938f133b9fa0e8.jpg"
-                    alt="Culture"
+                    src="/siab/trad.jpg"
+                    alt="Traditional"
                     className="w-[50px] h-[50px] rounded-full object-cover"
                   />
                   <span className="font-semibold text-[#333]">Traditional</span>
                 </Link>
                 <Link href="/beauty" className="category-item flex items-center gap-3 mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
                   <img
-                    src="https://i.pinimg.com/736x/71/96/78/7196782be79e3bb8c1a170ac09fcbdc8.jpg"
+                    src="/siab/beau.jpg"
                     alt="Beauty"
                     className="w-[50px] h-[50px] rounded-full object-cover"
                   />
