@@ -30,21 +30,42 @@ const Footer = () => {
               Explore
             </h3>
             <ul className="list-none p-0">
-              <li className="my-[8px]">
-                <a href="#" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
+              <div className='flex gap-12'>
+                <li className="my-[8px]">
+                <a href="/home" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
                   Home
                 </a>
               </li>
               <li className="my-[8px]">
-                <a href="#trending" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
+                <a href="/trending" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
                   Trending
                 </a>
               </li>
-              <li className="my-[8px]">
-                <a href="#" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
-                  Contact-xxxxxx1234
+              </div>
+              <div className='flex gap-6.5'>
+                <li className="my-[6px]">
+                <a href="/featured" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
+                  Featured
                 </a>
               </li>
+              <li className="my-[6px]">
+                <a href="/wedding" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
+                  Wedding
+                </a>
+              </li>
+              </div>
+              <div className='flex gap-5'>
+                <li className="my-[8px]">
+                <a href="/traditional" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
+                  Traditional
+                </a>
+              </li>
+              <li className="my-[8px]">
+                <a href="/beauty" className="text-[#ccc] no-underline hover:text-white transition-colors duration-300">
+                  Beauty
+                </a>
+              </li>
+              </div>
             </ul>
           </div>
 

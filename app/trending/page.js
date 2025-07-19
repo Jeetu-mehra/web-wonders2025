@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import ContentGrid from '@/components/ContentGrid'
 import Head from 'next/head'
 import Link from 'next/link'
+import Footer from '@/components/footer'
 
 const tren = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -220,6 +221,7 @@ const tren = () => {
           />
         </div>
       </div>
+      <Footer />
 
       <style jsx global>{`
         @keyframes slideIn {
