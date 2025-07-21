@@ -1,69 +1,18 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import ContentGrid from '@/components/ContentGrid'
 import Head from 'next/head'
 import Link from 'next/link'
 import Footer from '@/components/footer'
 
-const trad = () => {
+const Wed = () => {
   const [currentPage, setCurrentPage] = useState(1)
+  const dropdownHandlers = useRef([])
+  const exploreLinks = useRef([])
 
+  // Setup scroll reveal effect (runs once)
   useEffect(() => {
-    // Smooth scroll to section
-    const handleScroll = (e) => {
-      e.preventDefault()
-      const targetId = e.currentTarget.getAttribute('href')
-      const targetElement = document.querySelector(targetId)
-      if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth'
-        })
-      }
-    }
-
-    const exploreLinks = document.querySelectorAll('a[href="#trending"]')
-    exploreLinks.forEach(link => {
-      link.addEventListener('click', handleScroll)
-    })
-
-    // Dropdown functionality
-    const dropdowns = document.querySelectorAll('.dropdown')
-
-    const handleMouseEnter = (dropdownContent) => {
-      return () => {
-        dropdownContent.classList.add('show')
-      }
-    }
-
-    const handleMouseLeave = (dropdownContent) => {
-      return () => {
-        dropdownContent.classList.remove('show')
-      }
-    }
-
-    const dropdownHandlers = []
-
-    dropdowns.forEach(dropdown => {
-      const dropbtn = dropdown.querySelector('.dropbtn')
-      const dropdownContent = dropdown.querySelector('.dropdown-content')
-
-      const enterHandler = handleMouseEnter(dropdownContent)
-      const leaveHandler = handleMouseLeave(dropdownContent)
-
-      dropbtn.addEventListener('mouseenter', enterHandler)
-      dropdown.addEventListener('mouseleave', leaveHandler)
-
-      dropdownHandlers.push({
-        dropbtn,
-        dropdown,
-        enterHandler,
-        leaveHandler
-      })
-    })
-
-    // Scroll reveal effect
     const reveals = document.querySelectorAll(".reveal")
-
     const revealOnScroll = () => {
       for (let i = 0; i < reveals.length; i++) {
         const windowHeight = window.innerHeight
@@ -81,15 +30,82 @@ const trad = () => {
 
     return () => {
       window.removeEventListener("scroll", revealOnScroll)
-      exploreLinks.forEach(link => {
+    }
+  }, [])
+
+  // Setup hero banner event listeners (runs when banner mounts)
+  useEffect(() => {
+    if (currentPage !== 1) return
+
+    // Smooth scroll to section
+    const handleScroll = (e) => {
+      e.preventDefault()
+      const targetId = e.currentTarget.getAttribute('href')
+      const targetElement = document.querySelector(targetId)
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
+    }
+
+    // Get fresh references to elements
+    exploreLinks.current = document.querySelectorAll('a[href="#trending"]')
+    exploreLinks.current.forEach(link => {
+      link.addEventListener('click', handleScroll)
+    })
+
+    // Dropdown functionality
+    const dropdowns = document.querySelectorAll('.dropdown')
+    dropdownHandlers.current = []
+
+    const handleMouseEnter = (dropdownContent) => {
+      return () => {
+        dropdownContent.classList.add('show')
+      }
+    }
+
+    const handleMouseLeave = (dropdownContent) => {
+      return () => {
+        dropdownContent.classList.remove('show')
+      }
+    }
+
+    dropdowns.forEach(dropdown => {
+      const dropbtn = dropdown.querySelector('.dropbtn')
+      const dropdownContent = dropdown.querySelector('.dropdown-content')
+
+      if (!dropbtn || !dropdownContent) return
+
+      const enterHandler = handleMouseEnter(dropdownContent)
+      const leaveHandler = handleMouseLeave(dropdownContent)
+
+      dropbtn.addEventListener('mouseenter', enterHandler)
+      dropdown.addEventListener('mouseleave', leaveHandler)
+
+      dropdownHandlers.current.push({
+        dropbtn,
+        dropdown,
+        enterHandler,
+        leaveHandler
+      })
+    })
+
+    // Cleanup function
+    return () => {
+      exploreLinks.current.forEach(link => {
         link.removeEventListener('click', handleScroll)
       })
-      dropdownHandlers.forEach(({ dropbtn, dropdown, enterHandler, leaveHandler }) => {
+      
+      dropdownHandlers.current.forEach(({ dropbtn, dropdown, enterHandler, leaveHandler }) => {
         dropbtn?.removeEventListener('mouseenter', enterHandler)
         dropdown?.removeEventListener('mouseleave', leaveHandler)
       })
+      
+      dropdownHandlers.current = []
+      exploreLinks.current = []
     }
-  }, [])
+  }, [currentPage])
 
   return (
     <>
@@ -279,4 +295,4 @@ const trad = () => {
   )
 }
 
-export default trad
+export default Wed
