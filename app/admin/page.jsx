@@ -1,12 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, FaTimes, FaSignOutAlt } from 'react-icons/fa'
+import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, FaTimes, FaSignOutAlt, FaCrop } from 'react-icons/fa'
 import Link from 'next/link'
 import imageCompression from 'browser-image-compression'
 import { loadContent, addContentItem, updateContentItem, deleteContentItem, logout } from '@/lib/storage'
+import Cropper from 'react-easy-crop'
 
-// Notification Component
 const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes", cancelText = "No" }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -59,6 +59,13 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   
+  // Cropping states
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [showCropModal, setShowCropModal] = useState(false)
+  const [originalImage, setOriginalImage] = useState(null)
+  
   // Notification states
   const [showNotification, setShowNotification] = useState(false)
   const [notificationConfig, setNotificationConfig] = useState({
@@ -71,6 +78,7 @@ export default function AdminPage() {
   })
 
   const router = useRouter()
+  const cropContainerRef = useRef(null)
 
   useEffect(() => {
     const auth = localStorage.getItem('velure-auth')
@@ -144,6 +152,65 @@ export default function AdminPage() {
     }
   }
 
+  const createImage = (url) =>
+    new Promise((resolve, reject) => {
+      const image = new Image()
+      image.addEventListener('load', () => resolve(image))
+      image.addEventListener('error', (error) => reject(error))
+      image.src = url
+    })
+
+  const getCroppedImg = async (imageSrc, cropArea) => {
+    const image = await createImage(imageSrc)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    // Set canvas size to match the content grid box aspect ratio (1:1)
+    const size = Math.min(image.width, image.height)
+    canvas.width = size
+    canvas.height = size
+
+    ctx.drawImage(
+      image,
+      cropArea.x,
+      cropArea.y,
+      cropArea.width,
+      cropArea.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    )
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob)
+      }, 'image/webp', 0.9)
+    })
+  }
+
+  const onCropComplete = (croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }
+
+  const handleSaveCrop = async () => {
+    try {
+      setIsCompressing(true)
+      const croppedImage = await getCroppedImg(originalImage, croppedAreaPixels)
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setFormData({...formData, image: event.target.result})
+        setShowCropModal(false)
+      }
+      reader.readAsDataURL(croppedImage)
+    } catch (error) {
+      showAlert('Error cropping image', 'error')
+      console.error(error)
+    } finally {
+      setIsCompressing(false)
+    }
+  }
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -152,7 +219,8 @@ export default function AdminPage() {
       const compressedFile = await compressImage(file)
       const reader = new FileReader()
       reader.onload = (event) => {
-        setFormData({...formData, image: event.target.result})
+        setOriginalImage(event.target.result)
+        setShowCropModal(true)
       }
       reader.readAsDataURL(compressedFile)
     } catch (error) {
@@ -183,7 +251,6 @@ export default function AdminPage() {
             : await addContentItem(contentData)
           
           setContent(updatedContent)
-          // Reset form immediately after success
           setFormData({
             id: '',
             title: '',
@@ -288,12 +355,11 @@ export default function AdminPage() {
   }
 
   if (!isAuthenticated) {
-    return null // Will redirect to login page
+    return null
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Notification Overlay */}
       {showNotification && (
         <Notification
           message={notificationConfig.message}
@@ -303,6 +369,74 @@ export default function AdminPage() {
           confirmText={notificationConfig.confirmText}
           cancelText={notificationConfig.cancelText}
         />
+      )}
+
+      {showCropModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Crop Image</h3>
+              <button 
+                onClick={() => setShowCropModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes className="text-xl" />
+              </button>
+            </div>
+            
+            <div className="relative w-full h-96 bg-black">
+              <Cropper
+                image={originalImage}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+                cropShape="rect"
+                showGrid={false}
+                style={{
+                  containerStyle: {
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative'
+                  }
+                }}
+              />
+            </div>
+            
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-4 w-full max-w-md">
+                <span className="text-sm text-gray-600">Zoom</span>
+                <input
+                  type="range"
+                  value={zoom}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  onChange={(e) => setZoom(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              
+              <button
+                onClick={handleSaveCrop}
+                disabled={isCompressing}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-sm font-medium ml-4"
+              >
+                {isCompressing ? (
+                  <span className="flex items-center">
+                    <FaSpinner className="animate-spin mr-2" /> Saving...
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <FaCrop className="mr-2" /> Apply Crop
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 mt-10">
@@ -382,7 +516,7 @@ export default function AdminPage() {
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Upload Image *
+                Upload Image * <span className="text-xs text-gray-500">(Image will be cropped to square)</span>
               </label>
               <div className="flex items-center justify-center w-full">
                 <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
