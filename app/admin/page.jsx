@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, FaTimes, FaSignOutAlt, FaCrop } from 'react-icons/fa'
 import Link from 'next/link'
-import imageCompression from 'browser-image-compression'
+// import imageCompression from 'browser-image-compression'
 import { loadContent, addContentItem, updateContentItem, deleteContentItem, logout } from '@/lib/storage'
 import Cropper from 'react-easy-crop'
 
@@ -11,9 +11,8 @@ const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes",
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
-        <div className={`flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4 ${
-          type === 'success' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
-        }`}>
+        <div className={`flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4 ${type === 'success' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
+          }`}>
           {type === 'success' ? <FaCheck className="text-xl" /> : <FaTimes className="text-xl" />}
         </div>
         <h3 className="text-lg font-medium text-center mb-4">{message}</h3>
@@ -28,9 +27,8 @@ const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes",
           )}
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${
-              type === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'
-            }`}
+            className={`px-4 py-2 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${type === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'
+              }`}
           >
             {confirmText}
           </button>
@@ -58,14 +56,14 @@ export default function AdminPage() {
   const [isCompressing, setIsCompressing] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  
+
   // Cropping states
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [showCropModal, setShowCropModal] = useState(false)
   const [originalImage, setOriginalImage] = useState(null)
-  
+
   // Notification states
   const [showNotification, setShowNotification] = useState(false)
   const [notificationConfig, setNotificationConfig] = useState({
@@ -137,20 +135,20 @@ export default function AdminPage() {
     )
   }
 
-  const compressImage = async (file) => {
-    const options = {
-      maxSizeMB: 0.5,
-      maxWidthOrHeight: 1200,
-      useWebWorker: true,
-      fileType: 'image/webp'
-    }
-    try {
-      setIsCompressing(true)
-      return await imageCompression(file, options)
-    } finally {
-      setIsCompressing(false)
-    }
-  }
+  // const compressImage = async (file) => {
+  //   const options = {
+  //     maxSizeMB: 0.5,
+  //     maxWidthOrHeight: 1200,
+  //     useWebWorker: true,
+  //     fileType: 'image/webp'
+  //   }
+  //   try {
+  //     setIsCompressing(true)
+  //     return await imageCompression(file, options)
+  //   } finally {
+  //     setIsCompressing(false)
+  //   }
+  // }
 
   const createImage = (url) =>
     new Promise((resolve, reject) => {
@@ -185,7 +183,7 @@ export default function AdminPage() {
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         resolve(blob)
-      }, 'image/webp', 0.9)
+      }, 'image/webp') // removed , 0.9)
     })
   }
 
@@ -199,7 +197,7 @@ export default function AdminPage() {
       const croppedImage = await getCroppedImg(originalImage, croppedAreaPixels)
       const reader = new FileReader()
       reader.onload = (event) => {
-        setFormData({...formData, image: event.target.result})
+        setFormData({ ...formData, image: event.target.result })
         setShowCropModal(false)
       }
       reader.readAsDataURL(croppedImage)
@@ -216,22 +214,21 @@ export default function AdminPage() {
     if (!file) return
 
     try {
-      const compressedFile = await compressImage(file)
       const reader = new FileReader()
       reader.onload = (event) => {
         setOriginalImage(event.target.result)
         setShowCropModal(true)
       }
-      reader.readAsDataURL(compressedFile)
+      reader.readAsDataURL(file)
     } catch (error) {
-      showAlert('Error compressing image', 'error')
+      showAlert('Error loading image', 'error')
       console.error(error)
     }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.image) {
       showAlert('Please upload an image', 'error')
       return
@@ -249,7 +246,7 @@ export default function AdminPage() {
           const updatedContent = editingId
             ? await updateContentItem(editingId, contentData)
             : await addContentItem(contentData)
-          
+
           setContent(updatedContent)
           setFormData({
             id: '',
@@ -332,10 +329,10 @@ export default function AdminPage() {
   const filteredContent = content.filter(item => {
     const categoryMatch = selectedCategory === 'all' || item.category === selectedCategory
     if (!searchTerm) return categoryMatch
-    
+
     const searchLower = searchTerm.toLowerCase()
     const tagsString = item.tags?.join(' ') || ''
-    
+
     return categoryMatch && (
       item.title.toLowerCase().includes(searchLower) ||
       item.description.toLowerCase().includes(searchLower) ||
@@ -376,14 +373,14 @@ export default function AdminPage() {
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">Crop Image</h3>
-              <button 
+              <button
                 onClick={() => setShowCropModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <FaTimes className="text-xl" />
               </button>
             </div>
-            
+
             <div className="relative w-full h-96 bg-black">
               <Cropper
                 image={originalImage}
@@ -404,7 +401,7 @@ export default function AdminPage() {
                 }}
               />
             </div>
-            
+
             <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-4 w-full max-w-md">
                 <span className="text-sm text-gray-600">Zoom</span>
@@ -418,7 +415,7 @@ export default function AdminPage() {
                   className="w-full"
                 />
               </div>
-              
+
               <button
                 onClick={handleSaveCrop}
                 disabled={isCompressing}
@@ -478,7 +475,7 @@ export default function AdminPage() {
                   type="text"
                   name="title"
                   value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                   required
                 />
@@ -488,7 +485,7 @@ export default function AdminPage() {
                 <select
                   name="category"
                   value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                   required
                 >
@@ -507,7 +504,7 @@ export default function AdminPage() {
               <textarea
                 name="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows="4"
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                 required
@@ -521,9 +518,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-center w-full">
                 <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                   {formData.image ? (
-                    <img 
-                      src={formData.image} 
-                      alt="Preview" 
+                    <img
+                      src={formData.image}
+                      alt="Preview"
                       className="h-full w-full object-contain p-2"
                     />
                   ) : (
@@ -545,8 +542,8 @@ export default function AdminPage() {
                       )}
                     </div>
                   )}
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     accept="image/*"
                     className="hidden"
                     onChange={handleImageUpload}
@@ -558,7 +555,7 @@ export default function AdminPage() {
               {formData.image && (
                 <button
                   type="button"
-                  onClick={() => setFormData({...formData, image: ''})}
+                  onClick={() => setFormData({ ...formData, image: '' })}
                   className="mt-2 text-sm text-red-600 hover:text-red-800"
                 >
                   Remove Image
@@ -572,7 +569,7 @@ export default function AdminPage() {
                 type="text"
                 name="tags"
                 value={formData.tags}
-                onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                 placeholder="fashion, summer, trends"
               />
@@ -583,7 +580,7 @@ export default function AdminPage() {
                 type="checkbox"
                 name="isFeatured"
                 checked={formData.isFeatured}
-                onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
+                onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
                 className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
               />
               <label className="ml-2 text-sm text-gray-700">Featured Content</label>
