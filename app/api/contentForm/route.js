@@ -20,3 +20,9 @@ export async function POST(request) {
         console.log(err);
     }
 }
+
+export async function GET (){
+    await connectionToDatabase();
+    const allContent = await Content.find();
+    return NextResponse.json({allContent});
+}
