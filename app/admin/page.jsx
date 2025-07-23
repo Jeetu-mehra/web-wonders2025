@@ -6,7 +6,6 @@ import Link from 'next/link'
 import imageCompression from 'browser-image-compression'
 import { loadContent, addContentItem, updateContentItem, deleteContentItem, logout } from '@/lib/storage'
  
-Add
 // Notification Component
 const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes", cancelText = "No" }) => {
   return (
