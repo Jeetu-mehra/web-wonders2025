@@ -4,8 +4,8 @@ const contentSchema = new mongoose.Schema({
     title: String,
     description: String,
     tags: String,
-    imageURL: String,
-    featurContent: Boolean,
+    imageURL: {type: String, default: "nothing", required:false},
+    featurContent: { type: Boolean, default: false },
     category: String
 })
 

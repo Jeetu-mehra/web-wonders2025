@@ -11,8 +11,8 @@ export async function POST(request) {
             description: description,
             tags: tags,
             category: category,
-            featurContent: featureContent,
-            imageURL:imageURL
+            // featurContent: featureContent,
+            // imageURL:imageURL
         })
         return NextResponse.json({message:"Content created"})
     }

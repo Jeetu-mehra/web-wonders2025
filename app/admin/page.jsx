@@ -1,4 +1,5 @@
 'use client'
+import { POST } from '../api/contentForm/route'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, FaTimes, FaSignOutAlt } from 'react-icons/fa'
@@ -164,6 +165,8 @@ export default function AdminPage() {
     }
   }
 
+//   This is the submit logic
+// This is where we attach backend
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -185,6 +188,26 @@ export default function AdminPage() {
             ? await updateContentItem(editingId, contentData)
             : await addContentItem(contentData)
           
+            try{
+                await fetch('http://localhost:3000/api/contentForm' , {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: formData.title,
+                        description: formData.description,
+                        tags: formData.tags,
+                         category: formData.category
+                     })
+                })
+            }catch(Err){
+                console.log(Err);
+                
+            }
+
+
+
+
+
           setContent(updatedContent)
           // Reset form immediately after success
           setFormData({
@@ -340,6 +363,7 @@ export default function AdminPage() {
           </button>
         </div>
 
+              {/*     ADD CONTENT PART    */}
         {activeTab === 'add-content' && (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
