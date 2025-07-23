@@ -10,7 +10,7 @@ import Cropper from 'react-easy-crop'
 const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes", cancelText = "No" }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+      <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4 shadow-xl">
         <div className={`flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4 ${type === 'success' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
           }`}>
           {type === 'success' ? <FaCheck className="text-xl" /> : <FaTimes className="text-xl" />}
@@ -134,21 +134,6 @@ export default function AdminPage() {
       'Cancel'
     )
   }
-
-  // const compressImage = async (file) => {
-  //   const options = {
-  //     maxSizeMB: 0.5,
-  //     maxWidthOrHeight: 1200,
-  //     useWebWorker: true,
-  //     fileType: 'image/webp'
-  //   }
-  //   try {
-  //     setIsCompressing(true)
-  //     return await imageCompression(file, options)
-  //   } finally {
-  //     setIsCompressing(false)
-  //   }
-  // }
 
   const createImage = (url) =>
     new Promise((resolve, reject) => {
@@ -370,7 +355,7 @@ export default function AdminPage() {
 
       {showCropModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">Crop Image</h3>
               <button
@@ -381,7 +366,7 @@ export default function AdminPage() {
               </button>
             </div>
 
-            <div className="relative w-full h-96 bg-black">
+            <div className="relative w-full h-64 sm:h-96 bg-black">
               <Cropper
                 image={originalImage}
                 crop={crop}
@@ -402,7 +387,7 @@ export default function AdminPage() {
               />
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4 w-full max-w-md">
                 <span className="text-sm text-gray-600">Zoom</span>
                 <input
@@ -419,14 +404,14 @@ export default function AdminPage() {
               <button
                 onClick={handleSaveCrop}
                 disabled={isCompressing}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-sm font-medium ml-4"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-sm font-medium w-full sm:w-auto"
               >
                 {isCompressing ? (
-                  <span className="flex items-center">
+                  <span className="flex items-center justify-center sm:justify-start">
                     <FaSpinner className="animate-spin mr-2" /> Saving...
                   </span>
                 ) : (
-                  <span className="flex items-center">
+                  <span className="flex items-center justify-center sm:justify-start">
                     <FaCrop className="mr-2" /> Apply Crop
                   </span>
                 )}
@@ -436,11 +421,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 mt-10">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex border-b border-gray-200">
+      <div className="max-w-7xl mx-auto py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div className="flex border-b border-gray-200 w-full sm:w-auto overflow-x-auto">
             <button
-              className={`px-6 py-3 font-medium relative ${activeTab === 'add-content' ? 'text-amber-600' : 'text-gray-600'}`}
+              className={`px-4 sm:px-6 py-3 font-medium relative whitespace-nowrap ${activeTab === 'add-content' ? 'text-amber-600' : 'text-gray-600'}`}
               onClick={() => setActiveTab('add-content')}
             >
               {editingId ? 'Edit Content' : 'Add Content'}
@@ -449,7 +434,7 @@ export default function AdminPage() {
               )}
             </button>
             <button
-              className={`px-6 py-3 font-medium relative ${activeTab === 'manage-content' ? 'text-amber-600' : 'text-gray-600'}`}
+              className={`px-4 sm:px-6 py-3 font-medium relative whitespace-nowrap ${activeTab === 'manage-content' ? 'text-amber-600' : 'text-gray-600'}`}
               onClick={() => setActiveTab('manage-content')}
             >
               Manage Content
@@ -460,15 +445,15 @@ export default function AdminPage() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium w-full sm:w-auto justify-center"
           >
             <FaSignOutAlt /> Logout
           </button>
         </div>
 
         {activeTab === 'add-content' && (
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input
@@ -476,7 +461,7 @@ export default function AdminPage() {
                   name="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                   required
                 />
               </div>
@@ -486,14 +471,14 @@ export default function AdminPage() {
                   name="category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                   required
                 >
                   <option value="--Select Category--" disabled>--Select Category--</option>
                   <option value="featured">Featured</option>
                   <option value="trending">Trending</option>
                   <option value="wedding">Wedding</option>
-                  <option value="culture">Culture</option>
+                  <option value="culture">Traditional</option>
                   <option value="beauty">Beauty</option>
                 </select>
               </div>
@@ -506,7 +491,7 @@ export default function AdminPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows="4"
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                 required
               ></textarea>
             </div>
@@ -516,7 +501,7 @@ export default function AdminPage() {
                 Upload Image * <span className="text-xs text-gray-500">(Image will be cropped to square)</span>
               </label>
               <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <label className="flex flex-col items-center justify-center w-full h-48 sm:h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                   {formData.image ? (
                     <img
                       src={formData.image}
@@ -532,10 +517,10 @@ export default function AdminPage() {
                           <svg className="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                           </svg>
-                          <p className="mb-2 text-sm text-gray-500">
+                          <p className="mb-2 text-sm text-gray-500 text-center">
                             <span className="font-semibold">Click to upload</span>
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 text-center">
                             PNG, JPG (MAX. 5MB)
                           </p>
                         </>
@@ -570,12 +555,12 @@ export default function AdminPage() {
                 name="tags"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                 placeholder="fashion, summer, trends"
               />
             </div>
 
-            <div className="flex items-center mb-8">
+            <div className="flex items-center mb-6 sm:mb-8">
               <input
                 type="checkbox"
                 name="isFeatured"
@@ -586,23 +571,23 @@ export default function AdminPage() {
               <label className="ml-2 text-sm text-gray-700">Featured Content</label>
             </div>
 
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4">
               {editingId && (
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
               )}
               <button
                 type="submit"
-                className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-sm font-medium"
+                className="px-4 sm:px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-sm font-medium"
                 disabled={isCompressing}
               >
                 {isCompressing ? (
-                  <span className="flex items-center">
+                  <span className="flex items-center justify-center">
                     <FaSpinner className="animate-spin mr-2" /> Processing...
                   </span>
                 ) : editingId ? (
@@ -616,10 +601,10 @@ export default function AdminPage() {
         )}
 
         {activeTab === 'manage-content' && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Manage Content</h2>
-              <div className="flex gap-4">
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Manage Content</h2>
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -629,10 +614,10 @@ export default function AdminPage() {
                   <option value="featured">Featured</option>
                   <option value="trending">Trending</option>
                   <option value="wedding">Wedding</option>
-                  <option value="culture">Culture</option>
+                  <option value="culture">Traditional</option>
                   <option value="beauty">Beauty</option>
                 </select>
-                <div className="relative w-64">
+                <div className="relative w-full sm:w-64">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FaSearch className="text-gray-400" />
                   </div>
@@ -651,30 +636,30 @@ export default function AdminPage() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preview</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preview</th>
+                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Category</th>
+                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
+                    <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredContent.length > 0 ? (
                     filteredContent.map((item) => (
                       <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <img src={item.image} alt={item.title} className="h-12 w-12 rounded object-cover" />
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                          <img src={item.image} alt={item.title} className="h-10 sm:h-12 w-10 sm:w-12 rounded object-cover" />
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 sm:px-6 py-4">
                           <div className="text-sm font-medium text-gray-900">{item.title}</div>
                           <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                           <span className="px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 capitalize">
                             {item.category}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                           {item.isFeatured ? (
                             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
                               Featured
@@ -685,25 +670,25 @@ export default function AdminPage() {
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => handleEdit(item)}
-                            className="text-amber-600 hover:text-amber-900 mr-4"
+                            className="text-amber-600 hover:text-amber-900 mr-2 sm:mr-4"
                           >
-                            <FaEdit className="inline mr-1" /> Edit
+                            <FaEdit className="inline mr-1" /> <span className="hidden sm:inline">Edit</span>
                           </button>
                           <button
                             onClick={() => handleDelete(item.id)}
                             className="text-red-600 hover:text-red-900"
                           >
-                            <FaTrash className="inline mr-1" /> Delete
+                            <FaTrash className="inline mr-1" /> <span className="hidden sm:inline">Delete</span>
                           </button>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                      <td colSpan="5" className="px-4 sm:px-6 py-4 text-center text-sm text-gray-500">
                         {searchTerm ? 'No matching content found' : 'No content available'}
                       </td>
                     </tr>
