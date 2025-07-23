@@ -5,7 +5,8 @@ import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, Fa
 import Link from 'next/link'
 import imageCompression from 'browser-image-compression'
 import { loadContent, addContentItem, updateContentItem, deleteContentItem, logout } from '@/lib/storage'
-
+ 
+Add
 // Notification Component
 const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes", cancelText = "No" }) => {
   return (
@@ -40,6 +41,7 @@ const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes",
   )
 }
 
+// for the manage content side
 export default function AdminPage() {
   const [content, setContent] = useState([])
   const [activeTab, setActiveTab] = useState('add-content')
@@ -59,6 +61,7 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   
+
   // Notification states
   const [showNotification, setShowNotification] = useState(false)
   const [notificationConfig, setNotificationConfig] = useState({
@@ -115,6 +118,7 @@ export default function AdminPage() {
     setShowNotification(true)
   }
 
+  //logout logic
   const handleLogout = () => {
     showConfirmDialog(
       'Are you sure you want to logout?',
@@ -305,6 +309,8 @@ export default function AdminPage() {
         />
       )}
 
+
+      {/* This is the UI for admin page */}
       <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 mt-10">
         <div className="flex justify-between items-center mb-6">
           <div className="flex border-b border-gray-200">
@@ -338,6 +344,8 @@ export default function AdminPage() {
         {activeTab === 'add-content' && (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              
+              {/*    TEXT FIELD    */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input
@@ -349,6 +357,8 @@ export default function AdminPage() {
                   required
                 />
               </div>
+
+              {/*   SELECT CATEGORY   */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                 <select
@@ -368,6 +378,8 @@ export default function AdminPage() {
               </div>
             </div>
 
+
+            {/*     DESCRIPTION FIELD    */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
               <textarea
@@ -380,6 +392,8 @@ export default function AdminPage() {
               ></textarea>
             </div>
 
+
+            {/*     UPLOAD IMAGE    */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Upload Image *
@@ -432,6 +446,8 @@ export default function AdminPage() {
               )}
             </div>
 
+
+              {/*     TAGS    */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
               <input
@@ -444,6 +460,8 @@ export default function AdminPage() {
               />
             </div>
 
+
+              {/*     FEATURED?    */}
             <div className="flex items-center mb-8">
               <input
                 type="checkbox"
@@ -484,6 +502,8 @@ export default function AdminPage() {
           </form>
         )}
 
+
+        {/*     THE MANAGE CONTENT SECTION */}
         {activeTab === 'manage-content' && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-6">
