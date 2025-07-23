@@ -177,7 +177,7 @@ const Wed = () => {
             </div>
           </div>
 
-          <div className="hero-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-[999] max-w-[700px] px-5 w-full">
+          <div className="hero-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-10 max-w-[700px] px-5 w-full">
             <Link
               href="/home"
               className="nav-btn font-[montserrat] bg-white text-black py-2.5 px-5 rounded-full font-semibold cursor-pointer transition duration-300 hover:bg-transparent hover:text-white mb-4 inline-block"
@@ -289,6 +289,15 @@ const Wed = () => {
 
         .hero-text *[style*="animation"] {
           animation-fill-mode: forwards !important;
+        }
+
+        /* Fix for modal z-index */
+        .modal-overlay {
+          z-index: 1000 !important;
+        }
+        
+        .modal-content {
+          z-index: 1001 !important;
         }
       `}</style>
     </>

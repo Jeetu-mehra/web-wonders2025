@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
-// Dynamically import LocomotiveScroll to avoid SSR issues
 const LocomotiveScroll = typeof window !== "undefined" ? require("locomotive-scroll").default : null;
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,72 +13,76 @@ export default function useLocoScroll(start) {
     let locoScroll = null;
     let scrollEl = document.querySelector("[data-scroll-container]");
 
-    // Guard clause if no scroll container found
     if (!scrollEl) {
       console.warn("No element with [data-scroll-container] found");
       return;
     }
 
-    try {
-      // Initialize Locomotive Scroll
-      locoScroll = new LocomotiveScroll({
-        el: scrollEl,
-        smooth: true,
-        multiplier: 1,
-        smartphone: {
-          smooth: false,
-        },
-        tablet: {
-          smooth: false,
-        },
-        reloadOnContextChange: true,
-      });
+    // Initialize with safer options
+    locoScroll = new LocomotiveScroll({
+      el: scrollEl,
+      smooth: true,
+      multiplier: 1,
+      smartphone: { smooth: false },
+      tablet: { smooth: false },
+      reloadOnContextChange: true,
+      lerp: 0.1,
+      getDirection: true,
+      getSpeed: true
+    });
 
-      // Sync GSAP ScrollTrigger with Locomotive Scroll
-      locoScroll.on("scroll", ScrollTrigger.update);
+    // Error boundary for scroll events
+    const handleScroll = () => {
+      try {
+        ScrollTrigger.update();
+      } catch (e) {
+        console.warn("ScrollTrigger update error:", e);
+      }
+    };
 
-      ScrollTrigger.scrollerProxy(scrollEl, {
-        scrollTop(value) {
-          return arguments.length
-            ? locoScroll.scrollTo(value, { duration: 0, disableLerp: true })
-            : locoScroll.scroll.instance.scroll.y;
-        },
-        getBoundingClientRect() {
-          return {
-            top: 0,
-            left: 0,
-            width: window.innerWidth,
-            height: window.innerHeight,
-          };
-        },
-        pinType: scrollEl.style.transform ? "transform" : "fixed",
-      });
+    locoScroll.on("scroll", handleScroll);
 
-      // Update ScrollTrigger when Locomotive Scroll refreshes
-      const lsUpdate = () => {
-        if (locoScroll) {
-          locoScroll.update();
+    ScrollTrigger.scrollerProxy(scrollEl, {
+      scrollTop(value) {
+        if (arguments.length && locoScroll) {
+          locoScroll.scrollTo(value, {
+            duration: 0,
+            disableLerp: true
+          });
         }
-      };
+        return locoScroll?.scroll?.instance?.scroll?.y || 0;
+      },
+      getBoundingClientRect() {
+        return {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight
+        };
+      },
+      pinType: scrollEl.style.transform ? "transform" : "fixed"
+    });
 
-      ScrollTrigger.addEventListener("refresh", lsUpdate);
-      ScrollTrigger.refresh();
-
-      // Cleanup function
-      return () => {
-        if (locoScroll) {
-          ScrollTrigger.removeEventListener("refresh", lsUpdate);
-          locoScroll.off("scroll");
-          locoScroll.destroy();
-          locoScroll = null;
-        }
-
-        ScrollTrigger.clearMatchMedia();
-        ScrollTrigger.defaults({ scroller: window });
+    // Refresh with delay to ensure DOM is ready
+    const refresh = () => {
+      if (locoScroll) {
+        locoScroll.update();
         ScrollTrigger.refresh();
-      };
-    } catch (error) {
-      console.error("Error initializing Locomotive Scroll:", error);
-    }
+      }
+    };
+
+    const refreshTimeout = setTimeout(refresh, 1000);
+
+    // Cleanup function
+    return () => {
+      clearTimeout(refreshTimeout);
+      if (locoScroll) {
+        locoScroll.off("scroll", handleScroll);
+        locoScroll.destroy();
+        locoScroll = null;
+      }
+      ScrollTrigger.clearMatchMedia();
+      ScrollTrigger.defaults({ scroller: window });
+    };
   }, [start]);
 }

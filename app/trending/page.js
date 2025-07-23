@@ -96,12 +96,12 @@ const Wed = () => {
       exploreLinks.current.forEach(link => {
         link.removeEventListener('click', handleScroll)
       })
-      
+
       dropdownHandlers.current.forEach(({ dropbtn, dropdown, enterHandler, leaveHandler }) => {
         dropbtn?.removeEventListener('mouseenter', enterHandler)
         dropdown?.removeEventListener('mouseleave', leaveHandler)
       })
-      
+
       dropdownHandlers.current = []
       exploreLinks.current = []
     }
@@ -177,7 +177,7 @@ const Wed = () => {
             </div>
           </div>
 
-          <div className="hero-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-[999] max-w-[700px] px-5 w-full">
+          <div className="hero-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white z-10 max-w-[700px] px-5 w-full">
             <Link
               href="/home"
               className="nav-btn font-[montserrat] bg-white text-black py-2.5 px-5 rounded-full font-semibold cursor-pointer transition duration-300 hover:bg-transparent hover:text-white mb-4 inline-block"
@@ -229,8 +229,8 @@ const Wed = () => {
       {/* Content Grid Section */}
       <div id="trending" className="min-h-screen bg-gradient-to-br from-white to-[#f5deb3]">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          <ContentGrid 
-            category="trending" 
+          <ContentGrid
+            category="trending"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             itemsPerPage={currentPage === 1 ? 3 : 9}
@@ -289,6 +289,14 @@ const Wed = () => {
 
         .hero-text *[style*="animation"] {
           animation-fill-mode: forwards !important;
+        }
+
+        .modal-overlay {
+          z-index: 1000 !important;
+        }
+
+        .modal-content {
+          z-index: 1001 !important;
         }
       `}</style>
     </>

@@ -80,3 +80,5 @@ pnpm-lock.yaml
 
 # Coverage reports
 coverage/
+
+.vercel

@@ -1,39 +1,28 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocomotiveScroll } from 'react-locomotive-scroll';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ScrollTriggerProxy = () => {
   const { scroll } = useLocomotiveScroll();
-  const isUpdating = useRef(false);
 
   useEffect(() => {
-    if (!scroll) return;
+    if (!scroll || !scroll.el) return;
 
-    gsap.registerPlugin(ScrollTrigger);
     const element = scroll.el;
 
-    // Prevent infinite loops
-    const onScroll = () => {
-      if (!isUpdating.current) {
-        isUpdating.current = true;
-        ScrollTrigger.update();
-        isUpdating.current = false;
-      }
-    };
-
-    scroll.on('scroll', onScroll);
-
-    ScrollTrigger.scrollerProxy(element, {
+    const scrollerProxy = {
       scrollTop(value) {
-        if (arguments.length) {
-          scroll.scrollTo(value, {
-            duration: 0,
-            disableLerp: true,
-            callback: () => ScrollTrigger.update()
-          });
+        try {
+          if (arguments.length) {
+            scroll.scrollTo(value, { duration: 0, disableLerp: true });
+          }
+          return scroll.scroll.instance.scroll.y;
+        } catch (err) {
+          return 0;
         }
-        return scroll.scroll.instance.scroll.y;
       },
       getBoundingClientRect() {
         return {
@@ -43,15 +32,34 @@ const ScrollTriggerProxy = () => {
           height: window.innerHeight
         };
       },
-      pinType: element.style.transform ? 'transform' : 'fixed'
-    });
+      pinType: element.style.transform ? "transform" : "fixed"
+    };
 
-    // Initialize
-    ScrollTrigger.defaults({ scroller: element });
-    ScrollTrigger.refresh();
+    ScrollTrigger.scrollerProxy(element, scrollerProxy);
+
+    const handleScroll = () => {
+      try {
+        ScrollTrigger.update();
+      } catch (err) {
+        console.warn("Scroll update error:", err);
+      }
+    };
+
+    scroll.on("scroll", handleScroll);
+
+    // Initialize with delay
+    const initTimeout = setTimeout(() => {
+      try {
+        scroll.update();
+        ScrollTrigger.refresh();
+      } catch (err) {
+        console.warn("Initialization error:", err);
+      }
+    }, 1500);
 
     return () => {
-      scroll.off('scroll', onScroll);
+      clearTimeout(initTimeout);
+      scroll.off("scroll", handleScroll);
       ScrollTrigger.getAll().forEach(t => t.kill());
       ScrollTrigger.clearMatchMedia();
     };
