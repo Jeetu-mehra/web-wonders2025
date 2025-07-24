@@ -90,9 +90,8 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'
+              }`}
           >
             &lt;
           </button>
@@ -113,11 +112,10 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
               <button
                 key={pageNum}
                 onClick={() => setCurrentPage(pageNum)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  currentPage === pageNum
-                    ? 'bg-black text-white'
-                    : 'bg-gray-200 hover:bg-gray-300'
-                }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === pageNum
+                  ? 'bg-black text-white'
+                  : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
               >
                 {pageNum}
               </button>
@@ -140,9 +138,8 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'
+              }`}
           >
             &gt;
           </button>
@@ -160,17 +157,17 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-2 right-4 text-gray-500 hover:text-black text-3xl"
+              className="fixed md:absolute top-4 md:top-2 right-4 text-amber-100 md:text-gray-500 hover:text-black text-3xl z-10"
               onClick={() => setSelectedItem(null)}
             >
               &times;
             </button>
 
-            <div className="h-64 md:h-auto md:w-1/3 flex-shrink-0">
+            <div className="w-full md:w-1/3 flex-shrink-0 overflow-hidden">
               <img
                 src={selectedItem.image}
                 alt={selectedItem.title}
-                className="w-full h-full object-cover rounded-lg shadow-md"
+                className="w-full h-auto object-contain rounded-lg"
               />
             </div>
 
