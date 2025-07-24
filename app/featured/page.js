@@ -5,7 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Footer from '@/components/footer'
 
-const feat = () => {
+const Feat = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -378,4 +378,4 @@ const feat = () => {
   )
 }
 
-export default feat
+export default Feat

@@ -5,7 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Footer from '@/components/footer'
 
-const tren = () => {
+const Tren = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
@@ -378,4 +378,4 @@ const tren = () => {
   )
 }
 
-export default tren
+export default Tren
