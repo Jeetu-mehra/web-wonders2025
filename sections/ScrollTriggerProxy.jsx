@@ -1,26 +1,41 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocomotiveScroll } from 'react-locomotive-scroll';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const ScrollTriggerProxy = () => {
   const { scroll } = useLocomotiveScroll();
+  const isMounted = useRef(false);
 
   useEffect(() => {
-    if (!scroll || !scroll.el) return;
+    if (!scroll || !scroll.el || isMounted.current) {
+      console.log("ScrollTriggerProxy: Skipping initialization - scroll or scroll.el missing or already mounted");
+      return;
+    }
 
+    isMounted.current = true;
     const element = scroll.el;
+
+    if (!document.contains(element)) {
+      console.warn("ScrollTriggerProxy: Scroll element not found in DOM");
+      return;
+    }
 
     const scrollerProxy = {
       scrollTop(value) {
         try {
+          if (!document.contains(element)) {
+            console.warn("ScrollTriggerProxy: Element not in DOM during scrollTop");
+            return 0;
+          }
           if (arguments.length) {
             scroll.scrollTo(value, { duration: 0, disableLerp: true });
           }
-          return scroll.scroll.instance.scroll.y;
+          return scroll.scroll.instance.scroll.y || 0;
         } catch (err) {
+          console.warn("ScrollTriggerProxy: Scroll update error:", err);
           return 0;
         }
       },
@@ -39,29 +54,44 @@ const ScrollTriggerProxy = () => {
 
     const handleScroll = () => {
       try {
+        if (!document.contains(element)) {
+          console.warn("ScrollTriggerProxy: Element not in DOM during scroll update");
+          return;
+        }
         ScrollTrigger.update();
       } catch (err) {
-        console.warn("Scroll update error:", err);
+        console.warn("ScrollTriggerProxy: Scroll update error:", err);
       }
     };
 
     scroll.on("scroll", handleScroll);
 
-    // Initialize with delay
     const initTimeout = setTimeout(() => {
       try {
-        scroll.update();
-        ScrollTrigger.refresh();
+        if (document.contains(element)) {
+          console.log("ScrollTriggerProxy: Initializing scroll and refreshing ScrollTrigger");
+          scroll.update();
+          ScrollTrigger.refresh();
+        } else {
+          console.warn("ScrollTriggerProxy: Element not in DOM during initialization");
+        }
       } catch (err) {
-        console.warn("Initialization error:", err);
+        console.warn("ScrollTriggerProxy: Initialization error:", err);
       }
-    }, 1500);
+    }, 2500);
 
     return () => {
       clearTimeout(initTimeout);
-      scroll.off("scroll", handleScroll);
-      ScrollTrigger.getAll().forEach(t => t.kill());
-      ScrollTrigger.clearMatchMedia();
+      try {
+        scroll.off("scroll", handleScroll);
+        ScrollTrigger.getAll().forEach(t => t.kill());
+        ScrollTrigger.clearMatchMedia();
+        scroll.stop();
+        console.log("ScrollTriggerProxy: Cleaned up");
+      } catch (err) {
+        console.warn("ScrollTriggerProxy: Cleanup error:", err);
+      }
+      isMounted.current = false;
     };
   }, [scroll]);
 
