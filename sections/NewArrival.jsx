@@ -176,7 +176,7 @@ const NewArrival = () => {
       ScrollTrigger.refresh();
     };
 
-    const timer = setTimeout(setupAnimation, 1000);
+    const timer = setTimeout(setupAnimation, 100);
 
     return () => {
       clearTimeout(timer);

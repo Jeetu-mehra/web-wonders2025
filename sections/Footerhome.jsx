@@ -108,12 +108,38 @@ const Footerhome = () => {
   const { scroll } = useLocomotiveScroll();
 
   const handleScroll = (id) => {
-    let elem = document.querySelector(id);
-    scroll.scrollTo(elem, {
-      offset: "-100",
-      duration: "2000",
-      easing: [0.25, 0.0, 0.35, 1.0],
-    });
+    try {
+      const elem = document.querySelector(id);
+      if (!elem) {
+        console.warn(`Footerhome: Element ${id} not found`);
+        return;
+      }
+      if (scroll) {
+        console.log(`Footerhome: Scrolling to ${id}`);
+        scroll.scrollTo(elem, {
+          offset: -100,
+          duration: 1000,
+          easing: [0.25, 0.0, 0.35, 1.0],
+          disableLerp: true,
+          callback: () => {
+            console.log(`Footerhome: Scroll to ${id} completed`);
+            scroll.update();
+            setTimeout(() => {
+              scroll.update();
+            }, 100);
+          }
+        });
+      } else {
+        console.warn("Footerhome: Scroll instance not available, using window.scrollTo");
+        const rect = elem.getBoundingClientRect();
+        window.scrollTo({
+          top: rect.top + window.scrollY - 100,
+          behavior: 'smooth'
+        });
+      }
+    } catch (err) {
+      console.warn("Footerhome: Scroll error:", err);
+    }
   };
 
   return (

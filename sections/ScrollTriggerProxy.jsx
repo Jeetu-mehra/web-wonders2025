@@ -71,14 +71,14 @@ const ScrollTriggerProxy = () => {
         if (document.contains(element)) {
           console.log("ScrollTriggerProxy: Initializing scroll and refreshing ScrollTrigger");
           scroll.update();
-          ScrollTrigger.refresh();
+          ScrollTrigger.refresh(true);
         } else {
           console.warn("ScrollTriggerProxy: Element not in DOM during initialization");
         }
       } catch (err) {
         console.warn("ScrollTriggerProxy: Initialization error:", err);
       }
-    }, 2500);
+    }, 100);
 
     return () => {
       clearTimeout(initTimeout);
@@ -86,7 +86,6 @@ const ScrollTriggerProxy = () => {
         scroll.off("scroll", handleScroll);
         ScrollTrigger.getAll().forEach(t => t.kill());
         ScrollTrigger.clearMatchMedia();
-        scroll.stop();
         console.log("ScrollTriggerProxy: Cleaned up");
       } catch (err) {
         console.warn("ScrollTriggerProxy: Cleanup error:", err);

@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useLocomotiveScroll } from 'react-locomotive-scroll';
-import Link from 'next/link';
 import styled from 'styled-components';
 
 const NavContainer = styled(motion.div)`
@@ -80,13 +79,39 @@ const Navbarhome = () => {
   const { scroll } = useLocomotiveScroll();
 
   const handleScroll = (id) => {
-    let elem = document.querySelector(id);
-    setClick(!click);
-    scroll.scrollTo(elem, {
-      offset: '-100',
-      duration: '2000',
-      easing: [0.25, 0.0, 0.35, 1.0],
-    });
+    try {
+      const elem = document.querySelector(id);
+      if (!elem) {
+        console.warn(`Navbar: Element ${id} not found`);
+        return;
+      }
+      setClick(!click);
+      if (scroll) {
+        console.log(`Navbar: Scrolling to ${id}`);
+        scroll.scrollTo(elem, {
+          offset: -100,
+          duration: 1000,
+          easing: [0.25, 0.0, 0.35, 1.0],
+          disableLerp: true,
+          callback: () => {
+            console.log(`Navbar: Scroll to ${id} completed`);
+            scroll.update();
+            setTimeout(() => {
+              scroll.update();
+            }, 100);
+          }
+        });
+      } else {
+        console.warn("Navbar: Scroll instance not available, using window.scrollTo");
+        const rect = elem.getBoundingClientRect();
+        window.scrollTo({
+          top: rect.top + window.scrollY - 100,
+          behavior: 'smooth'
+        });
+      }
+    } catch (err) {
+      console.warn("Navbar: Scroll error:", err);
+    }
   };
 
   return (

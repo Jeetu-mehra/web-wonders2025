@@ -36,7 +36,6 @@ export default function useLocoScroll(start, containerRef) {
       });
 
       window.locomotiveScroll = locoScroll;
-      locoScroll.stop(); // Pause initially
 
       const handleScroll = () => {
         try {
@@ -87,8 +86,7 @@ export default function useLocoScroll(start, containerRef) {
           if (locoScroll && document.contains(scrollEl)) {
             console.log("useLocoScroll: Refreshing scroll and ScrollTrigger");
             locoScroll.update();
-            ScrollTrigger.refresh();
-            locoScroll.start(); // Resume after refresh
+            ScrollTrigger.refresh(true);
           } else {
             console.warn("useLocoScroll: Element not in DOM during refresh");
           }
@@ -97,7 +95,7 @@ export default function useLocoScroll(start, containerRef) {
         }
       };
 
-      const refreshTimeout = setTimeout(refresh, 2500);
+      const refreshTimeout = setTimeout(refresh, 100);
 
       return () => {
         clearTimeout(refreshTimeout);

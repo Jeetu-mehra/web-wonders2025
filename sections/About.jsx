@@ -2,11 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import Image from 'next/image';
 
-// Update image paths to public folder
-// import img1 from "/Images/img1.webp";
-// import img2 from "/Images/img2.webp";
-// import img3 from "/Images/img3.webp";
-
 const Section = styled.section`
   min-height: 100vh;
   width: 80vw;

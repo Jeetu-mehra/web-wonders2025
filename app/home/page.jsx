@@ -5,9 +5,8 @@ import { useRef, useState, useEffect } from 'react';
 import { LocomotiveScrollProvider } from 'react-locomotive-scroll';
 import { ThemeProvider } from 'styled-components';
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { dark } from '@/styles/Themes';
-import useLocoScroll from '@/sections/useLocoScroll';
 
 const Loader = dynamic(() => import('@/sections/Loader'), { 
   ssr: false,
@@ -27,37 +26,11 @@ function HomePage() {
   const containerRef = useRef(null);
   const [loaded, setLoaded] = useState(false);
   const path = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 3000);
     return () => clearTimeout(timer);
   }, []);
-
-  // Use custom hook to manage Locomotive Scroll
-  useLocoScroll(loaded, containerRef);
-
-  // Handle route changes to ensure cleanup
-  useEffect(() => {
-    const handleRouteChangeStart = () => {
-      try {
-        if (window.locomotiveScroll) {
-          console.log("page.jsx: Destroying scroll instance on route change");
-          window.locomotiveScroll.stop();
-          window.locomotiveScroll.destroy();
-          window.locomotiveScroll = null;
-        }
-      } catch (err) {
-        console.warn("page.jsx: Error during route change cleanup:", err);
-      }
-    };
-
-    router.events?.on('routeChangeStart', handleRouteChangeStart);
-
-    return () => {
-      router.events?.off('routeChangeStart', handleRouteChangeStart);
-    };
-  }, [router]);
 
   return (
     <ThemeProvider theme={dark}>
