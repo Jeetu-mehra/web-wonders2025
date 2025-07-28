@@ -1,5 +1,4 @@
 'use client'
-import { POST } from '../api/contentForm/route'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, FaTimes, FaSignOutAlt } from 'react-icons/fa'
