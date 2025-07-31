@@ -11,7 +11,7 @@ const contentSchema = new mongoose.Schema({
 })
 
 //make model out of the schema
-const Content = mongoose.model("Content", contentSchema);
+const Content = mongoose.models.Content || mongoose.model("Content", contentSchema);
 
 //export the model
 export default Content;

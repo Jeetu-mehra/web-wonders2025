@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { loadContent } from '@/lib/storage'
+// import { loadContent } from '@/lib/storage'
 import Head from 'next/head'
 
 export default function ContentGrid({ category, currentPage, setCurrentPage, itemsPerPage }) {
@@ -8,20 +8,25 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
   const [selectedItem, setSelectedItem] = useState(null)
 
   useEffect(() => {
-    const loadAndFilterContent = () => {
-      const allContent = loadContent()
-      const filtered = category ? allContent.filter(item => item.category === category) : allContent
-      setContent(filtered)
+    // const loadAndFilterContent = () => {
+    //   const allContent = loadContent()
+    //   const filtered = category ? allContent.filter(item => item.category === category) : allContent
+    //   setContent(filtered)
+    // }
+
+    async function fetchContent() {
+      try {
+        const res = await fetch('http://localhost:3000/api/contentForm', { method: 'GET' })
+        const data = await res.json()
+        let allContent = data.allContent || []
+        // Only keep items with the specific category
+        const filtered = category ? allContent.filter(item => item.category === category) : []
+        setContent(filtered)
+      } catch (err) {
+        setContent([])
+      }
     }
-
-    loadAndFilterContent()
-
-    const handleStorageChange = () => {
-      loadAndFilterContent()
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    fetchContent();
   }, [category])
 
   // Calculate total items and pages
