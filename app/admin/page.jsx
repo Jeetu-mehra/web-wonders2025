@@ -38,6 +38,7 @@ const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes",
   )
 }
 
+// for the manage content side
 export default function AdminPage() {
   const [content, setContent] = useState([])
   const [activeTab, setActiveTab] = useState('add-content')
@@ -121,6 +122,8 @@ export default function AdminPage() {
     setShowNotification(true)
   }
 
+
+  //logout logic
   const handleLogout = () => {
     showConfirmDialog(
       'Are you sure you want to logout?',
@@ -211,6 +214,8 @@ export default function AdminPage() {
     }
   }
 
+    //  This is the submit logic
+    // This is where we attach backend
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -232,7 +237,24 @@ export default function AdminPage() {
             ? await updateContentItem(editingId, contentData)
             : await addContentItem(contentData)
 
+            try{
+                await fetch('http://localhost:3000/api/contentForm' , {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: formData.title,
+                        description: formData.description,
+                        tags: formData.tags,
+                         category: formData.category
+                     })
+                })
+            }catch(Err){
+                console.log(Err);
+                
+            }
+
           setContent(updatedContent)
+          //reset form immediately after success
           setFormData({
             id: '',
             title: '',
@@ -451,9 +473,14 @@ export default function AdminPage() {
           </button>
         </div>
 
+        {/*     Add Content Part     */}
+
         {activeTab === 'add-content' && (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
+
+
+                {/*     TEXT FIELD   */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input
@@ -465,6 +492,9 @@ export default function AdminPage() {
                   required
                 />
               </div>
+
+
+              {/*   SELECT CATEGORY  */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                 <select
@@ -484,6 +514,8 @@ export default function AdminPage() {
               </div>
             </div>
 
+
+            {/*     DESCRIPTION FIELD    */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
               <textarea
@@ -496,6 +528,9 @@ export default function AdminPage() {
               ></textarea>
             </div>
 
+
+            {/*     UPLOAD IMAGE    */}
+            
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Upload Image * <span className="text-xs text-gray-500">(Image will be cropped to square)</span>
