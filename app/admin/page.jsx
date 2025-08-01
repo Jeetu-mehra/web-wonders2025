@@ -402,19 +402,19 @@ export default function AdminPage() {
     )
   }
 
-  const filteredContent = content.filter(item => {
-    const categoryMatch = selectedCategory === 'all' || item.category === selectedCategory
-    if (!searchTerm) return categoryMatch
+  const filteredContent = Array.isArray(content) ? content.filter(item => {
+    const categoryMatch = selectedCategory === 'all' || item.category === selectedCategory;
+    if (!searchTerm) return categoryMatch;
 
-    const searchLower = searchTerm.toLowerCase()
-    const tagsString = item.tags?.join(' ') || ''
+    const searchLower = searchTerm.toLowerCase();
+    const tagsString = item.tags?.join(' ') || '';
 
     return categoryMatch && (
       item.title.toLowerCase().includes(searchLower) ||
       item.description.toLowerCase().includes(searchLower) ||
       tagsString.toLowerCase().includes(searchLower)
-    )
-  })
+    );
+  }) : [];
 
   if (isLoading) {
     return (
