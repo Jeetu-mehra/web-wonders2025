@@ -35,7 +35,12 @@ export default function Login({ onLogin }) {
         const id=credentials.id;
         const password=credentials.password;
 
-        const user = allUser.findOne({id, password})
+       
+        // Corrected array find method
+        const user = allUser.find(user => 
+            user.id === credentials.id && 
+            user.password === credentials.password
+        );
 
         if (user) {
             localStorage.setItem('velure-auth', 'true')
