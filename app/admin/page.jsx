@@ -180,17 +180,43 @@ export default function AdminPage() {
   }
 
   const handleSaveCrop = async () => {
+    // try {
+    //   setIsCompressing(true)
+    //   const croppedImage = await getCroppedImg(originalImage, croppedAreaPixels)
+    //   const reader = new FileReader()
+    //   reader.onload = (event) => {
+    //     setFormData({ ...formData, image: event.target.result })
+    //     setShowCropModal(false)
+    //   }
+    //   reader.readAsDataURL(croppedImage)
+    // } catch (error) {
+    //   showAlert('Error cropping image', 'error')
+    //   console.error(error)
+    // } finally {
+    //   setIsCompressing(false)
+    // }
     try {
       setIsCompressing(true)
       const croppedImage = await getCroppedImg(originalImage, croppedAreaPixels)
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        setFormData({ ...formData, image: event.target.result })
+
+      const formDataCloud = new FormData()
+      formDataCloud.append('file', croppedImage)
+      formDataCloud.append('upload_preset', process.env.NEXT_PUBLIC_UPLOAD_PRESET)
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formDataCloud
+      })
+
+      const data = await res.json()
+      if (data.secure_url) {
+        setFormData({ ...formData, image: data.secure_url }) // save Cloudinary URL
         setShowCropModal(false)
+      } else {
+        throw new Error('Cloudinary upload failed')
       }
-      reader.readAsDataURL(croppedImage)
     } catch (error) {
-      showAlert('Error cropping image', 'error')
+      showAlert('Error uploading image', 'error')
       console.error(error)
     } finally {
       setIsCompressing(false)
@@ -214,8 +240,8 @@ export default function AdminPage() {
     }
   }
 
-    //  This is the submit logic
-    // This is where we attach backend
+  //  This is the submit logic
+  // This is where we attach backend
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -225,7 +251,58 @@ export default function AdminPage() {
     }
 
     showConfirmDialog(
-      editingId ? 'Are you sure you want to update this content?' : 'Are you sure you want to add this content?',
+      // editingId ? 'Are you sure you want to update this content?' : 'Are you sure you want to add this content?',
+      // async () => {
+      //   const contentData = {
+      //     ...formData,
+      //     tags: formData.tags.split(',').map(tag => tag.trim())
+      //   }
+
+      //   try {
+      //     const updatedContent = editingId
+      //       ? await updateContentItem(editingId, contentData)
+      //       : await addContentItem(contentData)
+
+      //     try {
+      //       await fetch('/api/contentForm', {
+      //         method: "POST",
+      //         headers: { "Content-Type": "application/json" },
+      //         body: JSON.stringify({
+      //           title: formData.title,
+      //           description: formData.description,
+      //           tags: formData.tags,
+      //           category: formData.category
+      //         })
+      //       })
+      //     } catch (Err) {
+      //       console.log(Err);
+
+      //     }
+
+      //     setContent(updatedContent)
+      //     //reset form immediately after success
+      //     setFormData({
+      //       id: '',
+      //       title: '',
+      //       category: '--Select Category--',
+      //       description: '',
+      //       image: '',
+      //       tags: '',
+      //       isFeatured: false
+      //     })
+      //     setEditingId(null)
+      //     showAlert(editingId ? 'Content updated successfully!' : 'Content added successfully!')
+      //   } catch (error) {
+      //     showAlert('Error saving content', 'error')
+      //     console.error(error)
+      //   }
+      // },
+      // null,
+      // 'confirm',
+      // editingId ? 'Update' : 'Add'
+      editingId
+        ? 'Are you sure you want to update this content?'
+        : 'Are you sure you want to add this content?',
       async () => {
         const contentData = {
           ...formData,
@@ -233,28 +310,19 @@ export default function AdminPage() {
         }
 
         try {
-          const updatedContent = editingId
-            ? await updateContentItem(editingId, contentData)
-            : await addContentItem(contentData)
+          //  Send data (including Cloudinary URL) to MongoDB API
+          const res = await fetch('/api/contentForm', {
+            method: editingId ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(contentData)
+          })
 
-            try{
-                await fetch('/api/contentForm' , {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        title: formData.title,
-                        description: formData.description,
-                        tags: formData.tags,
-                         category: formData.category
-                     })
-                })
-            }catch(Err){
-                console.log(Err);
-                
-            }
+          if (!res.ok) throw new Error("Failed to save content")
 
-          setContent(updatedContent)
-          //reset form immediately after success
+          const updatedData = await res.json()
+          setContent(updatedData) // Refresh content from MongoDB response
+
+          //  Reset form after success
           setFormData({
             id: '',
             title: '',
@@ -265,6 +333,7 @@ export default function AdminPage() {
             isFeatured: false
           })
           setEditingId(null)
+
           showAlert(editingId ? 'Content updated successfully!' : 'Content added successfully!')
         } catch (error) {
           showAlert('Error saving content', 'error')
@@ -480,7 +549,7 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
 
 
-                {/*     TEXT FIELD   */}
+              {/*     TEXT FIELD   */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input
@@ -530,7 +599,7 @@ export default function AdminPage() {
 
 
             {/*     UPLOAD IMAGE    */}
-            
+
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Upload Image * <span className="text-xs text-gray-500">(Image will be cropped to square)</span>

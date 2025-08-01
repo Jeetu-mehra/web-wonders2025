@@ -14,19 +14,36 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
     //   setContent(filtered)
     // }
 
-    async function fetchContent() {
+    // async function fetchContent() {
+    //   try {
+    //     const res = await fetch('/api/contentForm', { method: 'GET' })
+    //     const data = await res.json()
+    //     let allContent = data.allContent || []
+    //     // Only keep items with the specific category
+    //     const filtered = category ? allContent.filter(item => item.category === category) : []
+    //     setContent(filtered)
+    //   } catch (err) {
+    //     setContent([])
+    //   }
+    // }
+    // fetchContent();
+    const loadContent = async () => {
       try {
-        const res = await fetch('/api/contentForm', { method: 'GET' })
+        const res = await fetch('/api/contentForm')
         const data = await res.json()
-        let allContent = data.allContent || []
-        // Only keep items with the specific category
-        const filtered = category ? allContent.filter(item => item.category === category) : []
+
+        let filtered = data
+        if (category && category !== 'all') {
+          filtered = data.filter(item => item.category === category)
+        }
+
         setContent(filtered)
       } catch (err) {
-        setContent([])
+        console.error("Error fetching content:", err)
       }
     }
-    fetchContent();
+
+    loadContent()
   }, [category])
 
   // Calculate total items and pages
@@ -56,8 +73,8 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
       {/* Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {currentItems.map((item, index) => (
-          <div
-            key={item.id}
+          <div 
+            key={item._id}
             className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[400px] opacity-0 translate-y-8 animate-fadeIn"
             style={{
               animationFillMode: 'forwards',

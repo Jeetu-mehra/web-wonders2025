@@ -1,17 +1,14 @@
 import mongoose from "mongoose";
 
-//defining schema
-const contentSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    tags: String,
-    imageURL: {type: String, default: "nothing", required:false},
-    featurContent: { type: Boolean, default: false },
-    category: String
-})
+//schema
+const ContentSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  tags: [String],
+  category: { type: String, required: true },
+  image: { type: String, required: true }, //  Cloudinary URL
+  isFeatured: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
 
-//make model out of the schema
-const Content = mongoose.models.Content || mongoose.model("Content", contentSchema);
-
-//export the model
-export default Content;
+export default mongoose.models.Content || mongoose.model("Content", ContentSchema);
