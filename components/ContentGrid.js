@@ -16,7 +16,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
 
     async function fetchContent() {
       try {
-        const res = await fetch('http://localhost:3000/api/contentForm', { method: 'GET' })
+        const res = await fetch('/api/contentForm', { method: 'GET' })
         const data = await res.json()
         let allContent = data.allContent || []
         // Only keep items with the specific category

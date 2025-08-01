@@ -238,7 +238,7 @@ export default function AdminPage() {
             : await addContentItem(contentData)
 
             try{
-                await fetch('http://localhost:3000/api/contentForm' , {
+                await fetch('/api/contentForm' , {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
