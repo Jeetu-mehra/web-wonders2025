@@ -1,11 +1,16 @@
 import connectionToDatabase from "@/lib/dbConnect";
 import Content from "@/Schemas/Content";
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 export async function POST(request) {
   try {
     await connectionToDatabase();
     const { title, description, tags, category, image, isFeatured } = await request.json();
+
+    if (!title || !description || !category || !image) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
 
     const newContent = await Content.create({
       title,
@@ -13,13 +18,14 @@ export async function POST(request) {
       tags,
       category,
       image,
-      isFeatured
+      isFeatured: !!isFeatured
     });
 
+    console.log('Created new content:', newContent);
     return NextResponse.json(newContent, { status: 201 });
   } catch (err) {
     console.error("Error creating content:", err);
-    return NextResponse.json({ error: "Failed to create content" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create content", details: err.message }, { status: 500 });
   }
 }
 
@@ -27,36 +33,42 @@ export async function GET() {
   try {
     await connectionToDatabase();
     const allContent = await Content.find().sort({ createdAt: -1 });
+    console.log('Fetched content:', allContent);
     return NextResponse.json(allContent, { status: 200 });
   } catch (err) {
     console.error("Error fetching content:", err);
-    return NextResponse.json({ error: "Failed to fetch content" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch content", details: err.message }, { status: 500 });
   }
 }
 
 export async function PUT(request) {
   try {
     await connectionToDatabase();
-    const { id, title, description, tags, category, image, isFeatured } = await request.json();
+    const { _id, title, description, tags, category, image, isFeatured } = await request.json();
 
-    if (!id) {
-      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    if (!_id || !mongoose.isValidObjectId(_id)) {
+      return NextResponse.json({ error: "Valid _id is required" }, { status: 400 });
+    }
+
+    if (!title || !description || !category || !image) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const updatedContent = await Content.findByIdAndUpdate(
-      id,
-      { title, description, tags, category, image, isFeatured },
-      { new: true }
+      _id,
+      { title, description, tags, category, image, isFeatured: !!isFeatured },
+      { new: true, runValidators: true }
     );
 
     if (!updatedContent) {
       return NextResponse.json({ error: "Content not found" }, { status: 404 });
     }
 
+    console.log('Updated content:', updatedContent);
     return NextResponse.json(updatedContent, { status: 200 });
   } catch (err) {
     console.error("Error updating content:", err);
-    return NextResponse.json({ error: "Failed to update content" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update content", details: err.message }, { status: 500 });
   }
 }
 
@@ -66,14 +78,19 @@ export async function DELETE(request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
-    if (!id) {
-      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    if (!id || !mongoose.isValidObjectId(id)) {
+      return NextResponse.json({ error: "Valid _id is required" }, { status: 400 });
     }
 
-    await Content.findByIdAndDelete(id);
+    const deletedContent = await Content.findByIdAndDelete(id);
+    if (!deletedContent) {
+      return NextResponse.json({ error: "Content not found" }, { status: 404 });
+    }
+
+    console.log('Deleted content with _id:', id);
     return NextResponse.json({ message: "Content deleted successfully" }, { status: 200 });
   } catch (err) {
     console.error("Error deleting content:", err);
-    return NextResponse.json({ error: "Failed to delete content" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete content", details: err.message }, { status: 500 });
   }
 }
