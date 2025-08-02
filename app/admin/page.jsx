@@ -40,7 +40,7 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [formData, setFormData] = useState({
-    id: '',
+    _id: '',
     title: '',
     category: '--Select Category--',
     description: '',
@@ -158,7 +158,7 @@ export default function AdminPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: currentUserId })
           })
-          localStorage.removeItem('currentUserId') // Clear user ID
+          localStorage.removeItem('currentUserId')
           router.push('/login')
         } catch (err) {
           console.error("Logout error:", err)
@@ -206,6 +206,10 @@ export default function AdminPage() {
         resolve(blob)
       }, 'image/webp')
     })
+  }
+  const getDisplayCategory = (category) => {
+    if (category === 'culture') return 'Traditional'
+    return category.charAt(0).toUpperCase() + category.slice(1)
   }
 
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
@@ -266,29 +270,49 @@ export default function AdminPage() {
       return
     }
 
+    if (formData.category === '--Select Category--') {
+      showAlert('Please select a valid category', 'error')
+      return
+    }
+
     showConfirmDialog(
       editingId ? 'Are you sure you want to update this content?' : 'Are you sure you want to add this content?',
       async () => {
         const contentData = {
-          ...formData,
-          tags: formData.tags.split(',').map(tag => tag.trim())
+          title: formData.title,
+          description: formData.description,
+          tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+          category: formData.category,
+          image: formData.image,
+          isFeatured: formData.isFeatured
+        }
+
+        if (editingId) {
+          contentData._id = editingId
         }
 
         try {
+          console.log('Submitting content:', contentData)
           const res = await fetch('/api/contentForm', {
-            method: editingId ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
+            method: editingId ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contentData)
           })
 
-          if (!res.ok) throw new Error("Failed to save content")
+          const responseData = await res.json()
+          console.log('Response from server:', responseData)
+
+          if (!res.ok) {
+            throw new Error(responseData.error || 'Failed to save content')
+          }
 
           const refreshed = await fetch('/api/contentForm')
           const freshData = await refreshed.json()
+          console.log('Refreshed content:', freshData)
           setContent(freshData)
 
           setFormData({
-            id: '',
+            _id: '',
             title: '',
             category: '--Select Category--',
             description: '',
@@ -300,8 +324,8 @@ export default function AdminPage() {
 
           showAlert(editingId ? 'Content updated successfully!' : 'Content added successfully!')
         } catch (error) {
-          showAlert('Error saving content', 'error')
-          console.error(error)
+          showAlert(`Error saving content: ${error.message}`, 'error')
+          console.error('Submit error:', error)
         }
       },
       null,
@@ -311,8 +335,9 @@ export default function AdminPage() {
   }
 
   const handleEdit = (item) => {
+    console.log('Editing item:', item)
     setFormData({
-      id: item.id,
+      _id: item._id,
       title: item.title,
       category: item.category,
       description: item.description,
@@ -320,7 +345,7 @@ export default function AdminPage() {
       tags: item.tags?.join(', ') || '',
       isFeatured: item.isFeatured || false
     })
-    setEditingId(item.id)
+    setEditingId(item._id)
     setActiveTab('add-content')
   }
 
@@ -329,11 +354,17 @@ export default function AdminPage() {
       'Are you sure you want to delete this item? This action cannot be undone.',
       async () => {
         try {
+          console.log('Deleting content with _id:', id)
           const res = await fetch(`/api/contentForm?id=${id}`, {
             method: 'DELETE'
           })
 
-          if (!res.ok) throw new Error("Failed to delete content")
+          const responseData = await res.json()
+          console.log('Delete response:', responseData)
+
+          if (!res.ok) {
+            throw new Error(responseData.error || 'Failed to delete content')
+          }
 
           const refresh = await fetch('/api/contentForm')
           const updatedData = await refresh.json()
@@ -341,8 +372,8 @@ export default function AdminPage() {
 
           showAlert('Content deleted successfully!')
         } catch (error) {
-          showAlert('Error deleting content', 'error')
-          console.error(error)
+          showAlert(`Error deleting content: ${error.message}`, 'error')
+          console.error('Delete error:', error)
         }
       },
       null,
@@ -357,7 +388,7 @@ export default function AdminPage() {
       'Are you sure you want to cancel editing? All unsaved changes will be lost.',
       () => {
         setFormData({
-          id: '',
+          _id: '',
           title: '',
           category: '--Select Category--',
           description: '',
@@ -596,7 +627,6 @@ export default function AdminPage() {
                     accept="image/*"
                     className="hidden"
                     onChange={handleImageUpload}
-                    required
                     disabled={isCompressing}
                   />
                 </label>
@@ -624,7 +654,7 @@ export default function AdminPage() {
               />
             </div>
 
-            <div className="flex items-center mb-6 sm:mb-8">
+            {/* <div className="flex items-center mb-6 sm:mb-8">
               <input
                 type="checkbox"
                 name="isFeatured"
@@ -633,7 +663,7 @@ export default function AdminPage() {
                 className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
               />
               <label className="ml-2 text-sm text-gray-700">Featured Content</label>
-            </div>
+            </div> */}
 
             <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4">
               {editingId && (
@@ -720,7 +750,7 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                           <span className="px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 capitalize">
-                            {item.category}
+                            {getDisplayCategory(item.category)}
                           </span>
                         </td>
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
@@ -742,7 +772,7 @@ export default function AdminPage() {
                             <FaEdit className="inline mr-1" /> <span className="hidden sm:inline">Edit</span>
                           </button>
                           <button
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => handleDelete(item._id)}
                             className="text-red-600 hover:text-red-900"
                           >
                             <FaTrash className="inline mr-1" /> <span className="hidden sm:inline">Delete</span>

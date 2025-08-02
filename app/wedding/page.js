@@ -4,6 +4,7 @@ import ContentGrid from '@/components/ContentGrid'
 import Head from 'next/head'
 import Link from 'next/link'
 import Footer from '@/components/footer'
+// import Image from 'next/image'
 
 const Wed = () => {
   const [currentPage, setCurrentPage] = useState(1)

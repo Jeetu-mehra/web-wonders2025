@@ -1,36 +1,32 @@
 'use client'
 import { useState, useEffect } from 'react'
-// import { loadContent } from '@/lib/storage'
 import Head from 'next/head'
+// import Image from 'next/image';
 
 export default function ContentGrid({ category, currentPage, setCurrentPage, itemsPerPage }) {
   const [content, setContent] = useState([])
   const [selectedItem, setSelectedItem] = useState(null)
 
-  useEffect(() => {
-    // const loadAndFilterContent = () => {
-    //   const allContent = loadContent()
-    //   const filtered = category ? allContent.filter(item => item.category === category) : allContent
-    //   setContent(filtered)
-    // }
+  // Function to preserve newlines and whitespace in description
+  const preserveFormatting = (text) => {
+    if (!text) return ''
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        {index < text.split('\n').length - 1 && <br />}
+      </span>
+    ))
+  }
 
-    // async function fetchContent() {
-    //   try {
-    //     const res = await fetch('/api/contentForm', { method: 'GET' })
-    //     const data = await res.json()
-    //     let allContent = data.allContent || []
-    //     // Only keep items with the specific category
-    //     const filtered = category ? allContent.filter(item => item.category === category) : []
-    //     setContent(filtered)
-    //   } catch (err) {
-    //     setContent([])
-    //   }
-    // }
-    // fetchContent();
+  useEffect(() => {
     const loadContent = async () => {
       try {
         const res = await fetch('/api/contentForm')
+        if (!res.ok) {
+          throw new Error(`Failed to fetch content: ${res.statusText}`)
+        }
         const data = await res.json()
+        console.log('ContentGrid fetched content:', data)
 
         let filtered = data
         if (category && category !== 'all') {
@@ -40,6 +36,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
         setContent(filtered)
       } catch (err) {
         console.error("Error fetching content:", err)
+        setContent([])
       }
     }
 
@@ -49,7 +46,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
   // Calculate total items and pages
   const totalItems = content.length
   const firstPageItems = 3
-  const subsequentPageItems = 9
+  const subsequentPageItems = itemsPerPage || 9
   const totalPages = Math.ceil((totalItems - firstPageItems) / subsequentPageItems) + 1
 
   // Calculate items to show
@@ -85,7 +82,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
             <div className="h-full w-full overflow-hidden">
               <img
                 src={item.image}
-                alt={item.tags}
+                alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 onError={(e) => {
                   e.target.src = '/placeholder-image.jpg'
@@ -96,11 +93,14 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
             <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-6 transform translate-y-full transition-all duration-500 ease-in-out group-hover:translate-y-0">
               <h3 className="text-xl font-medium mb-2 font-['Montserrat']">{item.tags}</h3>
               <p className="text-l opacity-90 font-sans">{item.title}</p>
-              {item.isFeatured && (
+              {/* <p className="text-sm opacity-90 font-sans" style={{ whiteSpace: 'pre-wrap' }}>
+                {preserveFormatting(item.description)}
+              </p> */}
+              {/* {item.isFeatured && (
                 <span className="absolute top-4 right-4 bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-['Montserrat']">
                   Featured
                 </span>
-              )}
+              )} */}
             </div>
           </div>
         ))}
@@ -108,12 +108,11 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-30 space-x-2 font-['Montserrat']">
+        <div className="flex justify-center mt-8 space-x-2 font-['Montserrat']">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'
-              }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
           >
             &lt;
           </button>
@@ -134,10 +133,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
               <button
                 key={pageNum}
                 onClick={() => setCurrentPage(pageNum)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === pageNum
-                  ? 'bg-black text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === pageNum ? 'bg-black text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 {pageNum}
               </button>
@@ -160,8 +156,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'
-              }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
           >
             &gt;
           </button>
@@ -198,7 +193,9 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
                 <h3 className="text-2xl font-bold font-['Playfair_Display']">{selectedItem.title}</h3>
               </div>
 
-              <p className="text-gray-600 mb-4 font-medium font-['Montserrat']">{selectedItem.description}</p>
+              <p className="text-gray-600 mb-4 font-medium font-['Montserrat']" style={{ whiteSpace: 'pre-wrap' }}>
+                {preserveFormatting(selectedItem.description)}
+              </p>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { FaChevronDown, FaSearch, FaHome, FaTimes } from 'react-icons/fa'
 import Link from 'next/link'
+// import Image from 'next/image';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)

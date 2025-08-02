@@ -6,7 +6,7 @@ const ContentSchema = new mongoose.Schema({
   description: { type: String, required: true },
   tags: [String],
   category: { type: String, required: true },
-  image: { type: String, required: true }, //  Cloudinary URL
+  image: { type: String, required: true }, // Cloudinary URL
   isFeatured: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
