@@ -116,6 +116,7 @@
 
 "use client"
 
+import Link from 'next/link';
 import { motion } from "framer-motion";
 import React from "react";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
@@ -300,7 +301,7 @@ const Footerhome = () => {
       >
         <ul>
           <li aria-hidden="true">
-            <a href="/">Home</a>
+            <Link href="/">Home</Link>
           </li>
           <li aria-hidden="true" onClick={() => handleScroll(".about")}>
             <a href="/trending">Trending</a>
