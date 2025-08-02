@@ -3,16 +3,13 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { FaCrown, FaSearch, FaEdit, FaTrash, FaArrowLeft, FaSpinner, FaCheck, FaTimes, FaSignOutAlt, FaCrop } from 'react-icons/fa'
 import Link from 'next/link'
-// import imageCompression from 'browser-image-compression'
-import { loadContent, addContentItem, updateContentItem, deleteContentItem, logout } from '@/lib/storage'
 import Cropper from 'react-easy-crop'
 
 const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes", cancelText = "No" }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4 shadow-xl">
-        <div className={`flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4 ${type === 'success' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
-          }`}>
+        <div className={`flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4 ${type === 'success' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
           {type === 'success' ? <FaCheck className="text-xl" /> : <FaTimes className="text-xl" />}
         </div>
         <h3 className="text-lg font-medium text-center mb-4">{message}</h3>
@@ -27,8 +24,7 @@ const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes",
           )}
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${type === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'
-              }`}
+            className={`px-4 py-2 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 ${type === 'success' ? 'bg-green-600 hover:bg-green-700' : 'bg-amber-600 hover:bg-amber-700'}`}
           >
             {confirmText}
           </button>
@@ -38,7 +34,6 @@ const Notification = ({ message, type, onConfirm, onCancel, confirmText = "Yes",
   )
 }
 
-// for the manage content side
 export default function AdminPage() {
   const [content, setContent] = useState([])
   const [activeTab, setActiveTab] = useState('add-content')
@@ -57,15 +52,14 @@ export default function AdminPage() {
   const [isCompressing, setIsCompressing] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [currentUserId, setCurrentUserId] = useState(null)
 
-  // Cropping states
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [showCropModal, setShowCropModal] = useState(false)
   const [originalImage, setOriginalImage] = useState(null)
 
-  // Notification states
   const [showNotification, setShowNotification] = useState(false)
   const [notificationConfig, setNotificationConfig] = useState({
     message: '',
@@ -80,14 +74,46 @@ export default function AdminPage() {
   const cropContainerRef = useRef(null)
 
   useEffect(() => {
-    const auth = localStorage.getItem('velure-auth')
-    if (!auth) {
-      router.push('/login')
-    } else {
-      setIsAuthenticated(true)
-      setIsLoading(false)
-      setContent(loadContent())
+    const checkAuthAndLoad = async () => {
+      try {
+        const userId = localStorage.getItem('currentUserId')
+        if (!userId) {
+          console.log('No userId found in localStorage, redirecting to login')
+          router.push('/login')
+          return
+        }
+
+        console.log('Checking auth for userId:', userId)
+        const authRes = await fetch('/api/checkAuth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: userId })
+        })
+
+        const authData = await authRes.json()
+        console.log('Auth response:', authData)
+
+        if (!authData.isAuthenticated) {
+          console.log('User not authenticated, redirecting to login')
+          router.push('/login')
+          return
+        }
+
+        setCurrentUserId(userId)
+        setIsAuthenticated(true)
+        setIsLoading(false)
+
+        const contentRes = await fetch('/api/contentForm')
+        const contentData = await contentRes.json()
+        console.log('Content fetched:', contentData)
+        setContent(contentData)
+      } catch (err) {
+        console.error('Auth/content fetch error:', err)
+        router.push('/login')
+      }
     }
+
+    checkAuthAndLoad()
   }, [router])
 
   const showConfirmDialog = (message, onConfirm, onCancel = null, type = 'confirm', confirmText = 'Yes', cancelText = 'No') => {
@@ -122,14 +148,22 @@ export default function AdminPage() {
     setShowNotification(true)
   }
 
-
-  //logout logic
   const handleLogout = () => {
     showConfirmDialog(
       'Are you sure you want to logout?',
-      () => {
-        logout()
-        router.push('/login')
+      async () => {
+        try {
+          await fetch('/api/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: currentUserId })
+          })
+          localStorage.removeItem('currentUserId') // Clear user ID
+          router.push('/login')
+        } catch (err) {
+          console.error("Logout error:", err)
+          showAlert('Error logging out', 'error')
+        }
       },
       null,
       'confirm',
@@ -151,7 +185,6 @@ export default function AdminPage() {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
-    // Set canvas size to match the content grid box aspect ratio (1:1)
     const size = Math.min(image.width, image.height)
     canvas.width = size
     canvas.height = size
@@ -171,7 +204,7 @@ export default function AdminPage() {
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         resolve(blob)
-      }, 'image/webp') // removed , 0.9)
+      }, 'image/webp')
     })
   }
 
@@ -180,21 +213,6 @@ export default function AdminPage() {
   }
 
   const handleSaveCrop = async () => {
-    // try {
-    //   setIsCompressing(true)
-    //   const croppedImage = await getCroppedImg(originalImage, croppedAreaPixels)
-    //   const reader = new FileReader()
-    //   reader.onload = (event) => {
-    //     setFormData({ ...formData, image: event.target.result })
-    //     setShowCropModal(false)
-    //   }
-    //   reader.readAsDataURL(croppedImage)
-    // } catch (error) {
-    //   showAlert('Error cropping image', 'error')
-    //   console.error(error)
-    // } finally {
-    //   setIsCompressing(false)
-    // }
     try {
       setIsCompressing(true)
       const croppedImage = await getCroppedImg(originalImage, croppedAreaPixels)
@@ -210,7 +228,7 @@ export default function AdminPage() {
 
       const data = await res.json()
       if (data.secure_url) {
-        setFormData({ ...formData, image: data.secure_url }) // save Cloudinary URL
+        setFormData({ ...formData, image: data.secure_url })
         setShowCropModal(false)
       } else {
         throw new Error('Cloudinary upload failed')
@@ -240,8 +258,6 @@ export default function AdminPage() {
     }
   }
 
-  //  This is the submit logic
-  // This is where we attach backend
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -251,58 +267,7 @@ export default function AdminPage() {
     }
 
     showConfirmDialog(
-      // editingId ? 'Are you sure you want to update this content?' : 'Are you sure you want to add this content?',
-      // async () => {
-      //   const contentData = {
-      //     ...formData,
-      //     tags: formData.tags.split(',').map(tag => tag.trim())
-      //   }
-
-      //   try {
-      //     const updatedContent = editingId
-      //       ? await updateContentItem(editingId, contentData)
-      //       : await addContentItem(contentData)
-
-      //     try {
-      //       await fetch('/api/contentForm', {
-      //         method: "POST",
-      //         headers: { "Content-Type": "application/json" },
-      //         body: JSON.stringify({
-      //           title: formData.title,
-      //           description: formData.description,
-      //           tags: formData.tags,
-      //           category: formData.category
-      //         })
-      //       })
-      //     } catch (Err) {
-      //       console.log(Err);
-
-      //     }
-
-      //     setContent(updatedContent)
-      //     //reset form immediately after success
-      //     setFormData({
-      //       id: '',
-      //       title: '',
-      //       category: '--Select Category--',
-      //       description: '',
-      //       image: '',
-      //       tags: '',
-      //       isFeatured: false
-      //     })
-      //     setEditingId(null)
-      //     showAlert(editingId ? 'Content updated successfully!' : 'Content added successfully!')
-      //   } catch (error) {
-      //     showAlert('Error saving content', 'error')
-      //     console.error(error)
-      //   }
-      // },
-      // null,
-      // 'confirm',
-      // editingId ? 'Update' : 'Add'
-      editingId
-        ? 'Are you sure you want to update this content?'
-        : 'Are you sure you want to add this content?',
+      editingId ? 'Are you sure you want to update this content?' : 'Are you sure you want to add this content?',
       async () => {
         const contentData = {
           ...formData,
@@ -310,7 +275,6 @@ export default function AdminPage() {
         }
 
         try {
-          //  Send data (including Cloudinary URL) to MongoDB API
           const res = await fetch('/api/contentForm', {
             method: editingId ? "PUT" : "POST",
             headers: { "Content-Type": "application/json" },
@@ -319,10 +283,10 @@ export default function AdminPage() {
 
           if (!res.ok) throw new Error("Failed to save content")
 
-          const updatedData = await res.json()
-          setContent(updatedData) // Refresh content from MongoDB response
+          const refreshed = await fetch('/api/contentForm')
+          const freshData = await refreshed.json()
+          setContent(freshData)
 
-          //  Reset form after success
           setFormData({
             id: '',
             title: '',
@@ -365,8 +329,16 @@ export default function AdminPage() {
       'Are you sure you want to delete this item? This action cannot be undone.',
       async () => {
         try {
-          const updatedContent = await deleteContentItem(id)
-          setContent(updatedContent)
+          const res = await fetch(`/api/contentForm?id=${id}`, {
+            method: 'DELETE'
+          })
+
+          if (!res.ok) throw new Error("Failed to delete content")
+
+          const refresh = await fetch('/api/contentForm')
+          const updatedData = await refresh.json()
+          setContent(updatedData)
+
           showAlert('Content deleted successfully!')
         } catch (error) {
           showAlert('Error deleting content', 'error')
@@ -542,14 +514,9 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/*     Add Content Part     */}
-
         {activeTab === 'add-content' && (
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
-
-
-              {/*     TEXT FIELD   */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input
@@ -562,8 +529,6 @@ export default function AdminPage() {
                 />
               </div>
 
-
-              {/*   SELECT CATEGORY  */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                 <select
@@ -583,8 +548,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-
-            {/*     DESCRIPTION FIELD    */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
               <textarea
@@ -596,9 +559,6 @@ export default function AdminPage() {
                 required
               ></textarea>
             </div>
-
-
-            {/*     UPLOAD IMAGE    */}
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -750,9 +710,9 @@ export default function AdminPage() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredContent.length > 0 ? (
                     filteredContent.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
+                      <tr key={item._id} className="hover:bg-gray-50">
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                          <img src={item.image} alt={item.title} className="h-10 sm:h-12 w-10 sm:w-12 rounded object-cover" />
+                          <img src={item.image?.replace('/upload/', '/upload/f_auto,q_auto/')} alt={item.title} className="h-10 sm:h-12 w-10 sm:w-12 rounded object-cover" />
                         </td>
                         <td className="px-4 sm:px-6 py-4">
                           <div className="text-sm font-medium text-gray-900">{item.title}</div>

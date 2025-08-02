@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FaLock, FaUser } from 'react-icons/fa'
-import Notification from './Notification'
+import Notification from '@/components/Notification'
 
-export default function Login() {
+export default function Register() {
   const [credentials, setCredentials] = useState({ id: '', password: '' })
   const [showNotification, setShowNotification] = useState(false)
   const [notificationConfig, setNotificationConfig] = useState({
@@ -14,11 +14,11 @@ export default function Login() {
   })
   const router = useRouter()
 
-  async function handleLogin(e) {
+  async function handleRegister(e) {
     e.preventDefault()
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -28,31 +28,34 @@ export default function Login() {
       })
 
       const data = await res.json()
-      if (data.success) {
-        localStorage.setItem('currentUserId', credentials.id) // Store the custom id
-        router.push('/admin')
+      if (res.ok) {
+        setNotificationConfig({
+          message: 'User created successfully! You can now log in.',
+          type: 'success',
+          onConfirm: () => {
+            setShowNotification(false)
+            router.push('/login')
+          }
+        })
+        setShowNotification(true)
       } else {
         setNotificationConfig({
-          message: data.error || 'Authentication failed. Invalid ID or password.',
+          message: data.error || 'Failed to create user.',
           type: 'error',
           onConfirm: () => setShowNotification(false)
         })
         setShowNotification(true)
       }
     } catch (err) {
-      console.error('Login error:', err)
+      console.error('Registration error:', err)
       setNotificationConfig({
-        message: 'An error occurred during login. Please try again.',
+        message: 'An error occurred during registration. Please try again.',
         type: 'error',
         onConfirm: () => setShowNotification(false)
       })
       setShowNotification(true)
     }
   }
-
-//   const handleRegisterRedirect = () => {
-//     router.push('/register') // Redirect to a registration page
-//   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -66,8 +69,8 @@ export default function Login() {
       )}
 
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-3xl font-serif font-bold text-center mb-8">Admin Portal</h1>
-        <form onSubmit={handleLogin} className="space-y-6">
+        <h1 className="text-3xl font-serif font-bold text-center mb-8">Register</h1>
+        <form onSubmit={handleRegister} className="space-y-6">
           <div>
             <label htmlFor="id" className="block text-sm font-medium text-gray-700 mb-1">
               Admin ID
@@ -83,7 +86,7 @@ export default function Login() {
                 onChange={(e) => setCredentials({ ...credentials, id: e.target.value })}
                 className="pl-10 w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                 required
-                placeholder="Enter your admin ID"
+                placeholder="Choose an admin ID"
               />
             </div>
           </div>
@@ -103,7 +106,7 @@ export default function Login() {
                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                 className="pl-10 w-full px-4 py-2 border border-gray-300 rounded focus:ring-amber-500 focus:border-amber-500"
                 required
-                placeholder="Enter your password"
+                placeholder="Choose a password"
               />
             </div>
           </div>
@@ -113,17 +116,17 @@ export default function Login() {
               type="submit"
               className="w-full py-2 px-4 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
             >
-              Login
+              Register
             </button>
           </div>
 
           {/* <div className="text-center">
             <button
               type="button"
-              onClick={handleRegisterRedirect}
+              onClick={() => router.push('/login')}
               className="text-sm text-amber-600 hover:text-amber-800"
             >
-              Don't have an account? Register here
+              Already have an account? Log in here
             </button>
           </div> */}
         </form>
