@@ -367,4 +367,4 @@ const Footerhome = () => {
   );
 };
 
-export default Footerhome ;
+export default Footerhome;
