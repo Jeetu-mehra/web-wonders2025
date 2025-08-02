@@ -222,7 +222,7 @@ import React from "react";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 import styled from "styled-components";
 import Image from 'next/image';
-import "./footer.css";
+// import "./footer.css";
 
 const Section = styled.section`
   min-height: 100vh;
