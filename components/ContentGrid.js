@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
-import Image from 'next/image';
+// import Image from 'next/image';
 
 export default function ContentGrid({ category, currentPage, setCurrentPage, itemsPerPage }) {
   const [content, setContent] = useState([])
@@ -80,7 +80,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
             onClick={() => setSelectedItem(item)}
           >
             <div className="h-full w-full overflow-hidden">
-              <Image
+              <img
                 src={item.image}
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -181,7 +181,7 @@ export default function ContentGrid({ category, currentPage, setCurrentPage, ite
             </button>
 
             <div className="w-full md:w-1/3 flex-shrink-0 overflow-hidden">
-              <Image
+              <img
                 src={selectedItem.image}
                 alt={selectedItem.title}
                 className="w-full h-auto object-contain rounded-lg"
