@@ -1,5 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 
 const Footer = () => {
   return (
@@ -76,21 +77,21 @@ const Footer = () => {
             </h3>
             <div className="social-icons flex">
               <a href="#" className="mr-[15px] block w-[24px] h-[24px] hover:filter hover:invert-[60%] hover:sepia-[80%] hover:saturate-[300%] hover:hue-rotate-[280deg] transition-all duration-300">
-                <img 
+                <Image 
                   src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" 
                   alt="Instagram" 
                   className="w-full h-full invert" 
                 />
               </a>
               <a href="#" className="mr-[15px] block w-[24px] h-[24px] hover:filter hover:invert-[60%] hover:sepia-[80%] hover:saturate-[300%] hover:hue-rotate-[280deg] transition-all duration-300">
-                <img 
+                <Image 
                   src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg" 
                   alt="Twitter" 
                   className="w-full h-full invert" 
                 />
               </a>
               <a href="#" className="mr-[15px] block w-[24px] h-[24px] hover:filter hover:invert-[60%] hover:sepia-[80%] hover:saturate-[300%] hover:hue-rotate-[280deg] transition-all duration-300">
-                <img 
+                <Image
                   src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" 
                   alt="YouTube" 
                   className="w-full h-full invert" 

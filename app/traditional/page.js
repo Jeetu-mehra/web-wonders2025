@@ -4,6 +4,7 @@ import ContentGrid from '@/components/ContentGrid'
 import Head from 'next/head'
 import Link from 'next/link'
 import Footer from '@/components/footer'
+import Image from 'next/image';
 
 const Trad = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -118,7 +119,7 @@ const Trad = () => {
                 onMouseLeave={() => window.innerWidth > 768 && setIsDropdownOpen(false)}
               >
                 <Link href="/trending" className="category-item flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
-                  <img
+                  <Image
                     src="/siab/tren.jpg"
                     alt="Trending"
                     className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full object-cover"
@@ -126,7 +127,7 @@ const Trad = () => {
                   <span className="font-semibold text-[#333] text-xs sm:text-sm md:text-base">Trending</span>
                 </Link>
                 <Link href="/featured" className="category-item flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
-                  <img
+                  <Image
                     src="/siab/feat.jpg"
                     alt="Featured"
                     className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full object-cover"
@@ -134,7 +135,7 @@ const Trad = () => {
                   <span className="font-semibold text-[#333] text-xs sm:text-sm md:text-base">Featured</span>
                 </Link>
                 <Link href="/wedding" className="category-item flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
-                  <img
+                  <Image
                     src="/siab/wedd.jpg"
                     alt="Wedding"
                     className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full object-cover"
@@ -142,7 +143,7 @@ const Trad = () => {
                   <span className="font-semibold text-[#333] text-xs sm:text-sm md:text-base">Wedding</span>
                 </Link>
                 <Link href="/traditional" className="category-item flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
-                  <img
+                  <Image
                     src="/siab/trad.jpg"
                     alt="Traditional"
                     className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full object-cover"
@@ -150,7 +151,7 @@ const Trad = () => {
                   <span className="font-semibold text-[#333] text-xs sm:text-sm md:text-base">Traditional</span>
                 </Link>
                 <Link href="/beauty" className="category-item flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5 cursor-pointer transition-all duration-300 hover:bg-white/60 hover:rounded hover:p-1">
-                  <img
+                  <Image
                     src="/siab/beau.jpg"
                     alt="Beauty"
                     className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full object-cover"

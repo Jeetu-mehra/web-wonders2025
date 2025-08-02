@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { FaChevronDown, FaSearch, FaHome, FaTimes } from 'react-icons/fa'
 import Link from 'next/link'
+import Image from 'next/image';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -60,7 +61,7 @@ const Navbar = () => {
                     href={`/${category.id}`}
                     className="flex flex-col items-center cursor-pointer w-[120px] transition-all hover:-translate-y-1"
                   >
-                    <img
+                    <Image
                       src={category.image}
                       alt={category.name}
                       className="w-[100px] h-[100px] object-cover mb-2 rounded-full border-2 border-gray-200 transition-all hover:border-amber-600"
